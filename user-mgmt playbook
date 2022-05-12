@@ -1,0 +1,46 @@
+---
+- name: Ubuntu VM Configuration
+  hosts: ubuntuvm
+  become: true
+
+  tasks:
+  - name: add group
+    tags: groups
+    ansible.builtin.group:
+      name: cronadmin
+  - name: grant cronadmin sudo access
+    tags: cronadmin
+    community.general.sudoers:
+      group: cronadmin
+      name: cronadmin
+      state: present
+      commands:
+      - /usr/bin/systemctl restart cron
+      - /usr/bin/systemctl start cron
+      - /usr/bin/systemctl stop cron
+
+  - name: add usera
+    tags: users
+    ansible.builtin.user:
+      name: usera
+      groups: cronadmin
+      generate_ssh_key: yes
+      ssh_key_bits: 2048
+      ssh_key_file: .ssh/id_rsa
+
+  - name: add userb
+    tags: users
+    ansible.builtin.user:
+      name: userb
+      groups: cronadmin
+      generate_ssh_key: yes
+      ssh_key_bits: 2048
+      ssh_key_file: .ssh/id_rsa
+
+  - name: add userc
+    tags: users
+    ansible.builtin.user:
+      name: userc
+      generate_ssh_key: yes
+      ssh_key_bits: 2048
+      ssh_key_file: .ssh/id_rsa
